@@ -2,9 +2,13 @@ import Link from 'next/link';
 import React from 'react';
 import { cn } from '@/utils/cn';
 import type { Contact } from '@prisma/client';
+import { usePathname } from 'next/navigation';
+import { useSafeSearchParams } from '@/validations/routeSchema';
 
 export default function ContactButton({ contact }: { contact: Contact }) {
-  const isActive = false;
+  const pathName = usePathname();
+  const isActive = pathName.includes(contact.id);
+  const { q } = useSafeSearchParams('home');
 
   return (
     <Link
@@ -12,7 +16,7 @@ export default function ContactButton({ contact }: { contact: Contact }) {
         isActive ? 'bg-primary text-white' : 'hover:bg-gray',
         'flex w-full items-center justify-between gap-4 overflow-hidden whitespace-pre rounded-lg p-2 hover:no-underline',
       )}
-      href={`/contacts/${contact.id}`}
+      href={`/contacts/${contact.id}?&=${q}`}
     >
       {contact.first || contact.last ? (
         <>

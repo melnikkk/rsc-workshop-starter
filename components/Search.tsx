@@ -1,8 +1,21 @@
-import React from 'react';
+'use client';
+
+import React, { useTransition } from 'react';
 import { SearchIcon, SpinnerIcon } from './ui/icons';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Search() {
-  const searching = false;
+  const searchParams = useSearchParams();
+  const q = searchParams.get('q') || '';
+
+  const router = useRouter();
+
+  const [searching, startTransition] = useTransition();
+
+  const handleChange = e => {
+    e.preventDefault();
+    startTransition(() => router.push(`?q=${e.target.value}`));
+  };
 
   return (
     <form role="search">
@@ -12,6 +25,9 @@ export default function Search() {
         name="q"
         placeholder="Search"
         type="search"
+        defaultValue={q}
+        onChange={handleChange}
+        onSubmit={handleChange}
       />
       <div aria-hidden="true" className="absolute left-10 top-7">
         {searching ? (

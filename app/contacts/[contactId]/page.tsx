@@ -4,28 +4,24 @@ import LinkButton from '@/components/ui/LinkButton';
 import GithubLogo from '@/public/github-mark.svg';
 import Favorite from './_components/Favorite';
 import type { Contact } from '@prisma/client';
+import { getContact } from '@/data/services/getContact';
+import { routes } from '@/validations/routeSchema';
+import { deleteContact } from '@/data/actions/deleteContact';
+import DeleteButton from '@/app/contacts/[contactId]/_components/DeleteButton';
 
 type PageProps = {
-  params: Promise<{
-    contactId: string;
-  }>;
+  params: Promise<Contact>;
 };
 
 export default async function ContactPage({ params }: PageProps) {
-  const contactId = (await params).contactId;
+  const { contactId } = routes.contactId.$parseParams(await params);
 
-  const contact: Contact = {
-    avatar: '',
-    createdAt: new Date(),
-    email: '',
-    favorite: true,
-    first: 'John',
-    github: 'johndoe',
-    id: contactId,
-    last: 'Doe',
-    notes: 'This is a note.',
-    position: 'Software Engineer',
-    updatedAt: new Date(),
+  const contact = await getContact(contactId);
+
+  const onDeleteButtonClick = async () => {
+    'use server';
+
+    await deleteContact(contactId);
   };
 
   return (
@@ -79,9 +75,7 @@ export default async function ContactPage({ params }: PageProps) {
           <LinkButton theme="secondary" href={`/contacts/${contactId}/edit`}>
             Edit
           </LinkButton>
-          <Button type="submit" theme="destroy">
-            Delete
-          </Button>
+          <DeleteButton onDeleteButtonClick={onDeleteButtonClick} />
         </div>
       </div>
     </div>
